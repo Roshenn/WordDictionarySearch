@@ -3,6 +3,8 @@ import time
 from bs4 import BeautifulSoup
 import re
 import sys
+import random
+
 # 修改递深限制
 sys.setrecursionlimit(100000)
 
@@ -89,11 +91,11 @@ def run(str_match, query_rule):
 
         else:
             element = ''
-        sign = 'SSS:'
-        content = sign + element
-        CONTENT.append(content)
 
-    # 3.遍历查找单词, 并获取网站响应内容, 从中筛选出需要内容. 标记
+        # 添加任意字符串, 以区分单词是否找到相关释义,如不需要字符串为空''即可
+        sign = 'SSS:'
+        content = sign + str(element)
+        CONTENT.append(content)
 
 
 def show():
@@ -104,8 +106,12 @@ def show():
           '\n3.Synonym(同义词)\n'
           '\n4.Antonym(反义词)\n'
           '\n5.ContextualSentence(句子)\n'
+          '\n6.ALL\n'
           '')
-    select_num = int(input('请输入你的选择:'))
+    try:
+        select_num = int(input('请输入你的选择:'))
+    except Exception as e:
+        print('输入错误')
     return select_num
 
 
@@ -123,6 +129,21 @@ def write():
         for i in CONTENT:
             f.writelines(i)
             f.write(jump)
+        CONTENT.clear()
+
+
+def select(select_num):
+    global SELECT_NUM
+    SELECT_NUM = select_num
+    print(select_num)
+    # 对应相关正则表达式
+    str_match = STR_MATCH_DICT[SELECT_NUM]
+    query_rule = QUERY_RULE_DICT[SELECT_NUM]
+
+    run(str_match, query_rule)
+    # 写入内容
+    write()
+    print('任务结束___%s' % select_num)
 
 
 def mean():
@@ -136,25 +157,29 @@ def mean():
     if len(WORDS) < 1:
         print('无法获取单词')
         return
+    while True:
+        # 显示选择菜单
+        try:
+            select_num = show()
+        except Exception as e:
+            print(e)
+            continue
+        # 修改全局变量
 
-    # 显示选择菜单
-    select_num = show()
-    # 修改全局变量
-    global SELECT_NUM
+        # 默认选择5
+        # if SELECT_NUM:
+        select_list = range(1, 6)
 
-    SELECT_NUM = select_num
-    #
-    # # 默认选择5
-    # if SELECT_NUM:
+        if select_num == 6:
+            for i in select_list:
+                select(i)
 
-    # 对应相关正则表达式
-    str_match = STR_MATCH_DICT[SELECT_NUM]
-    query_rule = QUERY_RULE_DICT[SELECT_NUM]
+        elif select_num in select_list:
+            select(select_num)
 
-    run(str_match, query_rule)
-    write()
-    # 4.内容排序, 提炼, 之后输出
-    print('任务结束')
+        else:
+            print('输入错误,请重新输入')
+            continue
 
 
 if __name__ == '__main__':

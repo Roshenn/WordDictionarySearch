@@ -1,7 +1,7 @@
 # WordDictionarySearch
 
 Tool for querying word dictionary  
-##five functions:
+## five functions:
 	1.Definition(单词定义)  
 	2.WordFamily(形近词)  
 	3.Synonym(同义词)  
